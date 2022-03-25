@@ -26,4 +26,4 @@ If you want to selfhost **Hangman** :
 
 # Changelog
 
-- 1.0 : initial release.
+- 1.0 : Initial release.
