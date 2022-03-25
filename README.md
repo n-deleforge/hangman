@@ -12,7 +12,7 @@
 
 # Features 
 
-- Pretty and responsive.
+- Simple and responsive.
 - Nothing else, it's just another Hangman.
 
 # Quick start
