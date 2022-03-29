@@ -154,6 +154,7 @@ button:hover {
     border-radius: 0;
     font-size: 1em;
     cursor: pointer;
+    border-radius: 50%;
 }
 
 .keyboardButton:disabled {
