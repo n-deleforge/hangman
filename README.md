@@ -26,4 +26,5 @@ If you want to selfhost **Hangman** :
 
 # Changelog
 
+- 1.1 : modification of the application structure and a bit of CSS + JS rewriting. New icon / favicon.
 - 1.0 : Initial release.

@@ -1,6 +1,8 @@
 // =================================================
 // ============ SETTINGS 
 
+const HEALTH_ICON = "❤";
+const MAX_ERRORS = 7;
 const WORDS = [
     "AEROPORT", "AFFAIRE", "ALBUM", "ALPHABET", "AMENER", "AMPOULE", "ANCIEN", "ANORAK", "ANTENNE", "APPAREIL", "APPORTER", "APPUYER", "APRES", "ARC", "ARMOIRE", "ARRET", "ARRIERE", "ARRIVER", "ARROSER", "ASSIETTE", "ASSIS", "ATTACHER", "ATTENDRE", "ATTENTION", "ATTERRIR", "ATTRAPER", "AU", "AUTANT", "AUTO", "AUTOMOBILISTE", "AUTORADIO", "AUTOUR", "AVANCER", "AVANT", "AVEC", "AVION", 
     "BAGAGE", "BAGUETTE", "BAIGNER", "BÂILLER", "BALLE", "BANC", "BARBE", "BARBOTER", "BARQUE", "BARRE", "BARREAU", "BAS", "BATEAU", "BEAUCOUP", "BIBLIOTHEQUE", "BLANC", "BLEU", "BOIS", "BOITE", "BONDIR", "BONNET", "BORD", "BOSSER", "BOTTE", "BOUCHER", "BOUCHON", "BOUDER", "BOUGER", "BOUSCULER", "BOUT", "BOUTEILLE", "BOUTON", "BRAS", "BRETELLE", "BRICOLAGE", "BRUIT", "BRUN", "BULLES", "BUREAU", 
@@ -26,7 +28,10 @@ const WORDS = [
     "WAGON",
     "XYLOPHONE", 
     "ZERO", "ZIGZAG"];
-let _error = 0, _maxError = 7,  _errorDisplay = "", _wordData, _wordString, _wordArray;
+
+let _error = 0,
+    _errorDisplay = "",
+    _wordData, _wordString, _wordArray;
 
 // =================================================
 // ============ MAIN 
@@ -53,15 +58,18 @@ get("#reload").addEventListener("click", () => { location.reload(); });
     get("#play").style.display = "none";
 
     // Generate the "health bar"
-    get("#results").classList.add("resultsInGame");
-    for (let i = 0; i < _maxError; i++) {
-        _errorDisplay += "❤";
+    for (let i = 0; i < MAX_ERRORS; i++) {
+        _errorDisplay += HEALTH_ICON;
     }
 
     // Display the board
+    get("#titleScreen").style.display = "none";
+    get("#board").style.display = "flex";
+    get("#footer").innerHTML = FOOTER_INGAME;
+
+    // Generate keyboard and game
     generateKeyboard();
     updateGame();
-    get("#footer").innerHTML = FOOTER_INGAME;
 }
 
 /**
@@ -71,8 +79,8 @@ get("#reload").addEventListener("click", () => { location.reload(); });
 
  function chooseWord() {
     // Choose randomly a word
-    let nb = rand(0, WORDS.length);
-    _wordString = WORDS[nb];
+    let random = rand(0, WORDS.length);
+    _wordString = WORDS[random];
 
     // Transform the word as string in an array of underscore
     _wordArray = [];
@@ -109,7 +117,6 @@ function play(letterChoosen) {
     else {
         _error++;
         _errorDisplay = (_errorDisplay.substring(0, _errorDisplay.length - 1)).trim();
-        navigator.vibrate('300');
         get("#" + letterChoosen).style.background = getVariableCSS("incorrect");
     }
 
@@ -119,7 +126,7 @@ function play(letterChoosen) {
 }
 
 /**
- * Each turn update the board and check the win or the loss
+ * Each turn update the board and check the state of the game
  **/
 
 function updateGame() {
@@ -130,28 +137,39 @@ function updateGame() {
     }
 
     // Update the display
-    get('#guess').innerHTML = wordAsUnderscore.trim();
-    get('#results').innerHTML = _errorDisplay;
+    get('#wordToGuess').innerHTML = wordAsUnderscore.trim();
+    get('#healthbar').innerHTML = _errorDisplay;
 
     // Lose
-    if (_error == _maxError) {
-        get('#results').style.display = "none";
-        get('#guess').innerHTML = CONTENT.lost + _wordString;
-        get('#keyboard').style.display = "none";
-        get(".buttonList")[0].style.display = "flex";
-        get('#reload').style.display = "block";
+    if (_error === MAX_ERRORS) {
+        endGame("lose");
     }
 
     // Win
     else if (_wordArray.indexOf("_") == -1) {
-        get('#results').style.display = "none";
-        get('#guess').innerHTML = "<p>" + CONTENT.win_part1 + _error + CONTENT.win_part2 + "</p>";
-        get('#keyboard').style.display = "none";
-        get(".buttonList")[0].style.display = "flex";
-        get('#reload').style.display = "block";
+        endGame("win");
     }
 }
 
+/**
+ * Display the game over screen
+ * @param {string} mode win or lose
+ **/
+
+function endGame(mode) {
+    get('#board').style.display = "none";
+    get(".buttonList")[0].style.display = "flex";
+    get('#reload').style.display = "block";
+    get("#gameOver").style.display = "flex";
+
+    if (mode === "lose") {
+        get('#gameOver').innerHTML = "<p>" + CONTENT.lost + _wordString + "</p>";
+    }
+
+    if (mode === "win") {
+        get('#gameOver').innerHTML = "<p>" + CONTENT.win_part1 + _error + CONTENT.win_part2 + "</p>";
+    }
+}
 
 /**
  * Generate and display a virtual keyboard
